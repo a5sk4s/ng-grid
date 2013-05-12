@@ -36,7 +36,7 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
 
         //Enables cell editing.
         enableCellEdit: false,
-		
+        
         //Enables cell selection.
         enableCellSelection: false,
 
@@ -88,9 +88,9 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         //Initial fields to group data by. Array of field names, not displayName.
         groups: [],
         
-		// set the initial state of aggreagate grouping. "true" means they will be collapsed when grouping changes, "false" means they will be expanded by default.
-		groupsCollapsedByDefault: true,
-		
+        // set the initial state of aggreagate grouping. "true" means they will be collapsed when grouping changes, "false" means they will be expanded by default.
+        groupsCollapsedByDefault: true,
+        
         //The height of the header row in pixels.
         headerRowHeight: 30,
 
@@ -172,10 +172,10 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
 
         //Set the tab index of the Vieport.
         tabIndex: -1,
-		
-		//totalServerItems: Total items are on the server. 
+        
+        //totalServerItems: Total items are on the server. 
         totalServerItems: 0,
-			
+            
         /*Prevents the internal sorting from executing. 
         The sortInfo object will be updated with the sorting information so you can handle sorting (see sortInfo)*/
         useExternalSorting: false,
@@ -288,7 +288,7 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             $scope.renderedRows[i].rowIndex = newRows[i].rowIndex;
             $scope.renderedRows[i].offsetTop = newRows[i].offsetTop;
             $scope.renderedRows[i].selected = newRows[i].selected;
-			newRows[i].renderedRowIndex = i;
+            newRows[i].renderedRowIndex = i;
         }
         self.refreshDomSizes();
         $scope.$emit('ngGridEventRows', newRows);
@@ -427,23 +427,24 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         if (asterisksArray.length > 0) {
             self.config.maintainColumnRatios === false ? angular.noop() : self.config.maintainColumnRatios = true;
             // get the remaining width
-            var remainigWidth = self.rootDim.outerWidth - totalWidth;
+            var remainingWidth = self.rootDim.outerWidth - totalWidth;
             // calculate the weight of each asterisk rounded down
-            var asteriskVal = Math.floor(remainigWidth / asteriskNum);
+            var asteriskVal = Math.floor(remainingWidth / asteriskNum);
             // set the width of each column based on the number of stars
             angular.forEach(asterisksArray, function(col) {
                 var t = col.width.length;
                 $scope.columns[col.index].width = asteriskVal * t;
-                var offset = 1; //We're going to remove 1 px so we won't overlflow the viwport by default
+                var offset = Math.floor((col.index + 1) / asteriskNum); // we won't overflow the viewport by default with the correct css settings
                 // are we overflowing vertically?
-				if (self.maxCanvasHt > $scope.viewportDimHeight()) {
-					//compensate for scrollbar
-					offset += domUtilityService.ScrollW;
-				}
+                if (self.maxCanvasHt > $scope.viewportDimHeight()) {
+                    //compensate for scrollbar
+                    offset += Math.ceil(domUtilityService.ScrollW / asteriskNum);
+                }
                 $scope.columns[col.index].width -= offset;
                 if (col.visible !== false) {
                     totalWidth += $scope.columns[col.index].width;
                 }
+	            if ((col.index === $scope.columns.length-1) && ((self.rootDim.outerWidth - totalWidth) > 1 )) { $scope.columns[col.index].width += (self.rootDim.outerWidth - totalWidth - 1) }
             });
         }
         // Now we check if we saved any percentage columns for calculating last
@@ -460,7 +461,7 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             //factories and services
             $scope.selectionProvider = new ngSelectionProvider(self, $scope, $parse);
             $scope.domAccessProvider = new ngDomAccessProvider(self);
-    		self.rowFactory = new ngRowFactory(self, $scope, domUtilityService, $templateCache, $utils);
+            self.rowFactory = new ngRowFactory(self, $scope, domUtilityService, $templateCache, $utils);
             self.searchProvider = new ngSearchProvider($scope, self, $filter);
             self.styleProvider = new ngStyleProvider($scope, self);
             $scope.$watch('configGroups', function(a) {
@@ -712,24 +713,24 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             $scope.$emit('ngGridEventScroll');
         }
         var rowIndex = Math.floor(scrollTop / self.config.rowHeight);
-	    var newRange;
-	    if (self.filteredRows.length > self.config.virtualizationThreshold) {
-	        // Have we hit the threshold going down?
-	        if (self.prevScrollTop < scrollTop && rowIndex < self.prevScrollIndex + SCROLL_THRESHOLD) {
-	            return;
-	        }
-	        //Have we hit the threshold going up?
-	        if (self.prevScrollTop > scrollTop && rowIndex > self.prevScrollIndex - SCROLL_THRESHOLD) {
-	            return;
-	        }
-	        newRange = new ngRange(Math.max(0, rowIndex - EXCESS_ROWS), rowIndex + self.minRowsToRender() + EXCESS_ROWS);
-	    } else {
-	        var maxLen = $scope.configGroups.length > 0 ? self.rowFactory.parsedData.length : self.data.length;
-	        newRange = new ngRange(0, Math.max(maxLen, self.minRowsToRender() + EXCESS_ROWS));
-	    }
-	    self.prevScrollTop = scrollTop;
-	    self.rowFactory.UpdateViewableRange(newRange);
-	    self.prevScrollIndex = rowIndex;
+        var newRange;
+        if (self.filteredRows.length > self.config.virtualizationThreshold) {
+            // Have we hit the threshold going down?
+            if (self.prevScrollTop < scrollTop && rowIndex < self.prevScrollIndex + SCROLL_THRESHOLD) {
+                return;
+            }
+            //Have we hit the threshold going up?
+            if (self.prevScrollTop > scrollTop && rowIndex > self.prevScrollIndex - SCROLL_THRESHOLD) {
+                return;
+            }
+            newRange = new ngRange(Math.max(0, rowIndex - EXCESS_ROWS), rowIndex + self.minRowsToRender() + EXCESS_ROWS);
+        } else {
+            var maxLen = $scope.configGroups.length > 0 ? self.rowFactory.parsedData.length : self.data.length;
+            newRange = new ngRange(0, Math.max(maxLen, self.minRowsToRender() + EXCESS_ROWS));
+        }
+        self.prevScrollTop = scrollTop;
+        self.rowFactory.UpdateViewableRange(newRange);
+        self.prevScrollIndex = rowIndex;
     };
 
     //scope funcs
@@ -746,11 +747,11 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         return self.config.showGroupPanel;
     };
     $scope.topPanelHeight = function() {
-        return self.config.showGroupPanel === true ? self.config.headerRowHeight + 32 : self.config.headerRowHeight;
+        return self.config.headerRowHeight + (self.config.showGroupPanel === true ? 34 : 1);
     };
 
     $scope.viewportDimHeight = function() {
-        return Math.max(0, self.rootDim.outerHeight - $scope.topPanelHeight() - $scope.footerRowHeight - 2);
+        return Math.max(0, self.rootDim.outerHeight - $scope.topPanelHeight() - $scope.footerRowHeight);
     };
     $scope.groupBy = function (col) {
         if (self.data.length < 1 || !col.groupable  || !col.field) {

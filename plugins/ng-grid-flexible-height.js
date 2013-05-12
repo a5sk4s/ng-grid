@@ -6,24 +6,33 @@ ngGridFlexibleHeightPlugin = function (opts) {
         self.grid = grid;
         self.scope = scope;
         var recalcHeightForData = function () { setTimeout(innerRecalcForData, 1); };
+        // var delayedVisibiltyHack = function () { self.grid.$viewport.css('display', ''); };
         var innerRecalcForData = function () {
             var gridId = self.grid.gridId;
             var footerPanelSel = '.' + gridId + ' .ngFooterPanel';
             var extraHeight = self.grid.$topPanel.height() + $(footerPanelSel).height();
-            var naturalHeight = self.grid.$canvas.height() + 1;
+            var naturalHeight = self.grid.$canvas.height();
             if (scope.baseViewportHeight == null || scope.baseViewportHeight == 0) {
                 scope.baseViewportHeight = self.grid.$viewport.height();
             }
-            if (scope.baseViewportHeight > naturalHeight) {
+            // if (scope.baseViewportHeight > naturalHeight) {
                 if (opts != null) {
                     if (opts.minHeight != null && (naturalHeight + extraHeight) < opts.minHeight) {
-                        naturalHeight = opts.minHeight - extraHeight - 2;
+                        naturalHeight = opts.minHeight - extraHeight;
                     }
                 }
-                self.grid.$viewport.css('height', (naturalHeight + 2) + 'px');
-                self.grid.$root.css('height', (naturalHeight + extraHeight + 2) + 'px');
-            }
+		            self.grid.$viewport.hide();
+                self.grid.$viewport.css('height', (naturalHeight) + 'px');
+                self.grid.$root.css('height', (naturalHeight + extraHeight) + 'px');
+                self.grid.rootDim.outerHeight = (naturalHeight + extraHeight)
+                if (scope.baseViewportHeight < naturalHeight) {
+	                 self.grid.$canvas.css('width', self.grid.$viewport.width());
+	                 self.grid.configureColumnWidths();
+	                 scope.adjustScrollTop(0,true);
+	              }
+            // }
             self.grid.refreshDomSizes();
+            setTimeout(function(){self.grid.$viewport.show();}, 1);         
         };
         scope.catHashKeys = function () {
             var hash = '',
