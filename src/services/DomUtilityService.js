@@ -91,7 +91,7 @@
                 var colLeft = col.pinned ? grid.$viewport.scrollLeft() + sumWidth : sumWidth;
                 css += "." + gridId + " .col" + i + " { width: " + col.width + "px; left: " + colLeft + "px; height: " + rowHeight + "px }" +
                     "." + gridId + " .colt" + i + " { width: " + col.width + "px; }";
-                sumWidth += col.width;
+                sumWidth += col.width + 1;
             }
         };
         if ($utils.isIe) { // IE

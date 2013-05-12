@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 05/11/2013 18:58
+* Compiled At: 05/12/2013 12:47
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -283,7 +283,7 @@ ngGridServices.factory('$domUtilityService',['$utilityService', function($utils)
                 var colLeft = col.pinned ? grid.$viewport.scrollLeft() + sumWidth : sumWidth;
                 css += "." + gridId + " .col" + i + " { width: " + col.width + "px; left: " + colLeft + "px; height: " + rowHeight + "px }" +
                     "." + gridId + " .colt" + i + " { width: " + col.width + "px; }";
-                sumWidth += col.width;
+                sumWidth += col.width + 1;
             }
         };
         if ($utils.isIe) { // IE
@@ -303,26 +303,26 @@ ngGridServices.factory('$domUtilityService',['$utilityService', function($utils)
             if (!regex) {
                 regex = regexCache[col.index] = new RegExp("\.col" + col.index + " \{ width: [0-9]+px; left: [0-9]+px");
             }
-            var str = grid.$styleSheet.html();
-            var newStr = str.replace(regex, "\.col" + col.index + " \{ width: " + col.width + "px; left: " + colLeft + "px");
-            if ($utils.isIe) { // IE
-                setTimeout(function() {
-                    grid.$styleSheet.html(newStr);
-                });
-            } else {
-                grid.$styleSheet.html(newStr);
-            }
-        }
+			var str = grid.$styleSheet.html();
+			var newStr = str.replace(regex, "\.col" + col.index + " \{ width: " + col.width + "px; left: " + colLeft + "px");
+			if ($utils.isIe) { // IE
+			    setTimeout(function() {
+			        grid.$styleSheet.html(newStr);
+			    });
+			} else {
+			    grid.$styleSheet.html(newStr);
+			}
+		}
     };
     domUtilityService.setColLeft.immediate = 1;
-    domUtilityService.RebuildGrid = function($scope, grid){
-        domUtilityService.UpdateGridLayout($scope, grid);
-        if (grid.config.maintainColumnRatios) {
-            grid.configureColumnWidths();
-        }
-        $scope.adjustScrollLeft(grid.$viewport.scrollLeft());
-        domUtilityService.BuildStyles($scope, grid, true);
-    };
+	domUtilityService.RebuildGrid = function($scope, grid){
+		domUtilityService.UpdateGridLayout($scope, grid);
+		if (grid.config.maintainColumnRatios) {
+			grid.configureColumnWidths();
+		}
+		$scope.adjustScrollLeft(grid.$viewport.scrollLeft());
+		domUtilityService.BuildStyles($scope, grid, true);
+	};
 
     domUtilityService.digest = function($scope) {
         if (!$scope.$root.$$phase) {
@@ -1629,7 +1629,7 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             angular.forEach(asterisksArray, function(col) {
                 var t = col.width.length;
                 $scope.columns[col.index].width = asteriskVal * t;
-                var offset = Math.floor((col.index + 1) / asteriskNum); // we won't overflow the viewport by default with the correct css settings
+                var offset = Math.ceil((col.index + 1) / asteriskNum); // we won't overflow the viewport by default with the correct css settings
                 // are we overflowing vertically?
                 if (self.maxCanvasHt > $scope.viewportDimHeight()) {
                     //compensate for scrollbar
@@ -1637,9 +1637,9 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
                 }
                 $scope.columns[col.index].width -= offset;
                 if (col.visible !== false) {
-                    totalWidth += $scope.columns[col.index].width;
+                    totalWidth += $scope.columns[col.index].width + 1;
                 }
-	            if ((col.index === $scope.columns.length-1) && ((self.rootDim.outerWidth - totalWidth) > 1 )) { $scope.columns[col.index].width += (self.rootDim.outerWidth - totalWidth - 1) }
+	            if ((col.index === $scope.columns.length-1) && ((self.rootDim.outerWidth - totalWidth + 1) > 0 )) { $scope.columns[col.index].width += (self.rootDim.outerWidth - totalWidth + 1) }
             });
         }
         // Now we check if we saved any percentage columns for calculating last
@@ -2009,10 +2009,10 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             cols = $scope.columns;
         for (var i = 0; i < cols.length; i++) {
             if (cols[i].visible !== false) {
-                totalWidth += cols[i].width;
+                totalWidth += cols[i].width + 1;
             }
         }
-        return totalWidth;
+        return totalWidth - 1;
     };
     $scope.headerScrollerDim = function() {
         var viewportH = $scope.viewportDimHeight(),

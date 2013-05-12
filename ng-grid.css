@@ -113,15 +113,15 @@
 }
 
 .ngHeaderCell{
-    border-left: 1px solid rgb(212,212,212);
+    border-right: 1px solid rgb(212,212,212);
     position: absolute;
     top: 0; 
-    bottom: 0; 
+    bottom: 0;
     background-color: inherit;
 }
 
-.ngHeaderCell:first-child{
-    border-left: 0;
+.ngHeaderCell:last-child{
+    border-right: 0;
 }
 .ngHeaderCell.pinned {
     z-index: 1;
@@ -188,6 +188,7 @@
 
 .ngCanvas{
     position: relative;
+    border-bottom: 1px solid rgb(212,212,212);
 }
 
 /******** Rows ********/
@@ -212,14 +213,14 @@
 .ngCell {
     overflow: hidden; 
     position: absolute;
-    border-left: 1px solid rgb(212,212,212);
+    border-right: 1px solid rgb(212,212,212);
     top: 0; 
     bottom: 0; 
     background-color: inherit;
 }
 
-.ngCell:first-child{
-    border-left: 0;
+.ngCell:last-child{
+    border-right: 0;
 }
 
 .ngCell.pinned {

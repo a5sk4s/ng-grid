@@ -6,7 +6,6 @@ ngGridFlexibleHeightPlugin = function (opts) {
         self.grid = grid;
         self.scope = scope;
         var recalcHeightForData = function () { setTimeout(innerRecalcForData, 1); };
-        // var delayedVisibiltyHack = function () { self.grid.$viewport.css('display', ''); };
         var innerRecalcForData = function () {
             var gridId = self.grid.gridId;
             var footerPanelSel = '.' + gridId + ' .ngFooterPanel';
@@ -21,15 +20,16 @@ ngGridFlexibleHeightPlugin = function (opts) {
                         naturalHeight = opts.minHeight - extraHeight;
                     }
                 }
-		            self.grid.$viewport.hide();
-                self.grid.$viewport.css('height', (naturalHeight) + 'px');
-                self.grid.$root.css('height', (naturalHeight + extraHeight) + 'px');
-                self.grid.rootDim.outerHeight = (naturalHeight + extraHeight)
+	            self.grid.$viewport.hide();
+                self.grid.$viewport.css('height', (naturalHeight + 1) + 'px');
+                self.grid.$root.css('height', (naturalHeight + extraHeight + 1) + 'px');
+                self.grid.rootDim.outerHeight = (naturalHeight + extraHeight + 1)
                 if (scope.baseViewportHeight < naturalHeight) {
-	                 self.grid.$canvas.css('width', self.grid.$viewport.width());
-	                 self.grid.configureColumnWidths();
-	                 scope.adjustScrollTop(0,true);
-	              }
+	                self.grid.$canvas.css('width', self.grid.$viewport.width());
+			        self.grid.$canvas.css('bottom-border', 'none');
+	                self.grid.configureColumnWidths();
+	                scope.adjustScrollTop(0,true);
+				}
             // }
             self.grid.refreshDomSizes();
             setTimeout(function(){self.grid.$viewport.show();}, 1);         

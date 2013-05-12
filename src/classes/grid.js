@@ -434,7 +434,7 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             angular.forEach(asterisksArray, function(col) {
                 var t = col.width.length;
                 $scope.columns[col.index].width = asteriskVal * t;
-                var offset = Math.floor((col.index + 1) / asteriskNum); // we won't overflow the viewport by default with the correct css settings
+                var offset = Math.ceil((col.index + 1) / asteriskNum); // we won't overflow the viewport by default with the correct css settings
                 // are we overflowing vertically?
                 if (self.maxCanvasHt > $scope.viewportDimHeight()) {
                     //compensate for scrollbar
@@ -442,9 +442,9 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
                 }
                 $scope.columns[col.index].width -= offset;
                 if (col.visible !== false) {
-                    totalWidth += $scope.columns[col.index].width;
+                    totalWidth += $scope.columns[col.index].width + 1;
                 }
-	            if ((col.index === $scope.columns.length-1) && ((self.rootDim.outerWidth - totalWidth) > 1 )) { $scope.columns[col.index].width += (self.rootDim.outerWidth - totalWidth - 1) }
+	            if ((col.index === $scope.columns.length-1) && ((self.rootDim.outerWidth - totalWidth + 1) > 0 )) { $scope.columns[col.index].width += (self.rootDim.outerWidth - totalWidth + 1) }
             });
         }
         // Now we check if we saved any percentage columns for calculating last
@@ -814,10 +814,10 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
             cols = $scope.columns;
         for (var i = 0; i < cols.length; i++) {
             if (cols[i].visible !== false) {
-                totalWidth += cols[i].width;
+                totalWidth += cols[i].width + 1;
             }
         }
-        return totalWidth;
+        return totalWidth - 1;
     };
     $scope.headerScrollerDim = function() {
         var viewportH = $scope.viewportDimHeight(),
