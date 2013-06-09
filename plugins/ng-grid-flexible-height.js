@@ -29,6 +29,7 @@ function ngGridFlexibleHeightPlugin (opts) {
 			        self.grid.$canvas.css('bottom-border', 'none');
 	                self.grid.configureColumnWidths();
 	                scope.adjustScrollTop(0,true);
+	                scope.baseViewportHeight = self.grid.$viewport.height();
 				}
             // }
             self.grid.refreshDomSizes();
